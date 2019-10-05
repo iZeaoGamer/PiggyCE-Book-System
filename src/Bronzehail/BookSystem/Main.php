@@ -100,8 +100,8 @@ class Main extends PluginBase implements Listener{
         $ce = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
         $form = $formapi->createCustomForm(function ($sender, $data) use($dataid, $ce){
             if($data !== null){
-                if($sender->getCurrentTotalXp() < $this->getCost($dataid)){
-                    $sender->sendMessage(C::RED . "You don't have enough Exp!");
+                if(EconomyAPI::getInstance()->myMoney($sender) < $this->getCost($dataid)){
+                    $sender->sendMessage(C::RED . "You don't have enough money!");
                     return;
                 }
 
@@ -113,12 +113,12 @@ class Main extends PluginBase implements Listener{
                     if($id == $dataid) $item->setLore([$data[5], "\n" . " \n" . C::GRAY . "§bTap ground to get random custom enchantment"]);
                 }
                 $sender->getInventory()->addItem($item);
-                $sender->addXp(-$this->getCost($dataid));
+                EconomyAPI::getInstance()->takeMoney($sender->getName(), $this->getCost($dataid));
             }
         });
 
         $form->setTitle($ce->getRarityColor((int)$this->getNameByData($dataid, false)) . $this->getNameByData($dataid));
-        $form->addLabel("Cost: " . $this->getCost($dataid) . " Exp");
+        $form->addLabel("Cost: $" . $this->getCost($dataid));
         $form->sendToPlayer($sender);
     }
 
@@ -140,13 +140,13 @@ class Main extends PluginBase implements Listener{
                                 $enchs = [114, 101, 109, 601, 100, 405];
                                 break;
                             case 1: //Uncommon
-                                $enchs = [108, 122, 120, 309, 113, 801, 412, 408, 117, 121, 206, 202, 401, 209, 208, 603, 500, 103, 415, 402, 207, 210, 312, 504, 602, 304, 211, 800, 104, 403, 203, 406, 414, 201, 501, 502, 421, 111, 305, 115];
+                                $enchs = [122, 120, 309, 113, 801, 412, 408, 206, 202, 401, 209, 208, 603, 500, 402, 207, 210, 312, 504, 602, 304, 211, 104, 403, 203, 406, 201, 502, 421, 111, 305, 115];
                                 break;
                             case 2: //Rare
-                                $enchs = [417, 420, 411, 311, 416, 102, 410, 409, 804, 200, 404, 313, 310, 422, 600, 503, 123, 204, 315, 400, 303, 307, 424, 802, 700, 413, 407, 423, 308, 803, 205, 805, 316];
+                                $enchs = [420, 411, 311, 416, 102, 410, 409, 804, 200, 404, 313, 310, 422, 600, 204, 315, 400, 303, 307, 423, 308, 803, 205, 805, 316];
                                 break;
                             case 3: //Mythic
-                                $enchs = [604, 306, 418, 119, 212, 419, 314, 118, 301];
+                                $enchs = [604, 306, 212, 419, 314, 301];
                                 break;
                         }
                         $enchanted = false;
